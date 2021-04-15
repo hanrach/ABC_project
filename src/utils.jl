@@ -13,3 +13,7 @@ end
 function identity_mapping(y)
     y
 end
+
+function compute_norm(y,yhat;p=2)
+    norm(y - yhat, p)/size(y)[1]
+end
