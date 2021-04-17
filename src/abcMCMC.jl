@@ -13,7 +13,7 @@ function ABC_MCMC(y,yhat_generator,algo_parameters,max_time,N_samples)
 
     
     kernel = algo_parameters[:kernel]
-    sd = (0.1,0.1)
+    sd = (0.2,0.2)
     eta_y = algo_parameters[:eta](y)
     q = length(algo_parameters[:prior])
     result = zeros(N_samples,q)
@@ -27,7 +27,6 @@ function ABC_MCMC(y,yhat_generator,algo_parameters,max_time,N_samples)
         yhat = yhat_generator(p_prev)
         dist = algo_parameters[:d](eta_y, algo_parameters[:eta](yhat))
     end
-    @show p_prev
     log_p_prev = map(x->log(x), p_prev)
     naccept=0
     k = 1
@@ -73,7 +72,7 @@ function ABC_MCMC(y,yhat_generator,algo_parameters,max_time,N_samples)
         end
     end
     @printf("acceptance rate=%f\n", naccept/N_samples)
-    return result, naccept/N_samples
+    return result
 end
 
 
@@ -92,8 +91,4 @@ y = data_generator(true_p)
 # add noise
 y = y + rand(LogNormal(0,0.5),size(y))
 
-output, acceptance_rate=ABC_MCMC(y, data_generator, algo_parameters, 0, 100)
-
-using StatsPlots
-density(output[:,1], xlabel="Paramter value β")
-density(output[:,2], xlabel="Paramter value γ")
+output=ABC_MCMC(y, data_generator, algo_parameters, 0, 100)

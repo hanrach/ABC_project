@@ -14,6 +14,10 @@ function identity_mapping(y)
     y
 end
 
+function compute_norm(y,yhat;p=2)
+    norm(y - yhat, p)/size(y)[1]
+end
+
 function random_walk(p_prev, sd)
     # return proposed p, log(q(p_n+1|p_n))
     
