@@ -1,5 +1,6 @@
-using LinearAlgebra, DifferentialEquations, Distributions,Random
-using StatsPlots
+using LinearAlgebra, DifferentialEquations, Distributions, Random
+using Printf
+# using StatsPlots
 include("utils.jl")
 include("sir_ode.jl")
 include("abc.jl")
@@ -40,11 +41,18 @@ y = y + rand(LogNormal(0,0.5),size(y))
 output=ABC_MCMC(y, data_generator, algo_parameters, 0, 100)
 
 # Bayesian Calibration
-algo_parameters = (prior = (Gamma(2,1),Gamma(1,1)),epsilon = 10,eta = identity_mapping, d = compute_norm)
+algo_list = (ABC=ABC,ABC_MCMC=ABC_MCMC)
+algo_parameter_ABC = (prior = (Gamma(2,1),Gamma(1,1)),epsilon = 10,eta = identity_mapping, d = compute_norm)
+algo_parameter_mcmc = (prior = (Gamma(2,1),Gamma(1,1)),epsilon = 25,
+eta= identity_mapping, d= distanceFunction, kernel = random_walk, sd = (0.2,0.2))
+algo_param_list = (ABC = algo_parameter_ABC,
+                   ABC_MCMC = algo_parameter_mcmc)
 
-look = BayesianCalibration(100,0.0,Int(10), 0.05, ABC,algo_parameters)
+look = BayesianCalibration(10,0.0,Int(20),0.05,algo_list,algo_param_list)
 
 algo_parameters_mcmc = (prior = (Gamma(2,1),Gamma(1,1)),epsilon = 25,
-eta= identity_mapping, d= distanceFunction, kernel = random_walk)
+eta= identity_mapping, d= distanceFunction, kernel = random_walk, sd = (0.2,0.2))
 
 abc_mcmc_calibration = BayesianCalibration(100, 0.0, Int(20),0.05,ABC_MCMC, algo_parameters_mcmc )
+
+#String.(collect(keys(algo_list)))
