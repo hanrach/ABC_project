@@ -4,6 +4,7 @@ using LinearAlgebra
 using Random
 include("sir_ode.jl")
 include("abc.jl")
+include("abcMCMC.jl")
 include("utils.jl")
 
 # TODO: instead of one algo, accept a list of algos and a list of algo parameters
@@ -50,3 +51,8 @@ end
 algo_parameters = (prior = (Gamma(2,1),Gamma(1,1)),epsilon = 10,eta = identity_mapping, d = compute_norm)
 
 look = BayesianCalibration(100,0.0,Int(10), 0.05, ABC,algo_parameters)
+
+algo_parameters_mcmc = (prior = (Gamma(2,1),Gamma(1,1)),epsilon = 25,
+eta= identity_mapping, d= distanceFunction, kernel = random_walk)
+
+abc_mcmc_calibration = BayesianCalibration(100, 0.0, Int(20),0.05,ABC_MCMC, algo_parameters_mcmc )
