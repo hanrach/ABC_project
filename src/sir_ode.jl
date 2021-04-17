@@ -1,5 +1,3 @@
-using DifferentialEquations
-
 function solve_ode(u0, tspan, p)
         function SIR(du,u,p,t)
                 du[1]=-p[1]*u[1]*u[2]/(u[1]+u[2]+u[3])

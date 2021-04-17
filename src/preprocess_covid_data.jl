@@ -1,5 +1,5 @@
-using RCall
 using DataFrames, CSV, Dates
+using JLD
 
 # import data
 df_covid_raw = DataFrame(CSV.File("data/covid19-canada.csv"))
@@ -23,12 +23,15 @@ select!(df_covid_BC,:t,:S,:I,:R)
 filter!(:t => >=(Date(2020,3,26)), df_covid_BC)
 
 # before vaccine is administered: Dec 2020
-df_covic_BC_pre = filter(:t => <(Date(2020,12,1)),df_covid_BC)
+df_covid_BC_pre = filter(:t => <(Date(2020,12,1)),df_covid_BC)
 
 # after vaccine
-df_covic_BC_post = filter(:t => >=(Date(2020,12,1)),df_covid_BC)
+df_covid_BC_post = filter(:t => >=(Date(2020,12,1)),df_covid_BC)
 
 
 # save the output
-CSV.write("data/covid19_bc_pre_vaccine.csv",df_covic_BC_pre)
-CSV.write("data/covid19_bc_post_vaccine.csv",df_covic_BC_post)
+CSV.write("data/covid19_bc_pre_vaccine.csv",df_covid_BC_pre)
+CSV.write("data/covid19_bc_post_vaccine.csv",df_covid_BC_post)
+
+# save as JLD
+save("data/covid_bc.jld","pre",df_covid_BC_pre,"post",df_covid_BC_post)
