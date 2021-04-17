@@ -50,3 +50,8 @@ algo_parameters = (prior = (Gamma(2,1),Gamma(1,1)),epsilon = 25,
 eta= identity_mapping, d= distanceFunction)
 
 look = BayesianCalibration(100,0.0,Int(20), 0.05,ABC,algo_parameters)
+
+algo_parameters_mcmc = (prior = (Gamma(2,1),Gamma(1,1)),epsilon = 25,
+eta= identity_mapping, d= distanceFunction, kernel = random_walk)
+
+abc_mcmc_calibration = BayesianCalibration(100, 0.0, Int(20),0.05,ABC_MCMC, algo_parameters_mcmc )
