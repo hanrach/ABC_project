@@ -9,6 +9,7 @@ function ABC_MCMC(y,yhat_generator,algo_parameters,max_time,N_samples)
     kernel = algo_parameters[:kernel]
     sd = algo_parameters[:sd]
     eta_y = algo_parameters[:eta](y)
+    size_y = size(y)
     q = length(algo_parameters[:prior])
     thinning_interval = algo_parameters[:thinning]
 
@@ -20,6 +21,9 @@ function ABC_MCMC(y,yhat_generator,algo_parameters,max_time,N_samples)
         # sample parameters from prior
         p_prev = rand.(algo_parameters[:prior])
         yhat = yhat_generator(p_prev)
+        if size_y != size(yhat)
+            continue
+        end
         dist = algo_parameters[:d](eta_y, algo_parameters[:eta](yhat))
     end
 
@@ -34,6 +38,9 @@ function ABC_MCMC(y,yhat_generator,algo_parameters,max_time,N_samples)
         #generate data
         yhat = yhat_generator(exp.(log_p_cand))
         # yhat = yhat_generator( p_cand)
+        if size_y != size(yhat)
+            continue
+        end
         dist = algo_parameters[:d](eta_y, algo_parameters[:eta](yhat))
 
         u = rand(Uniform(0,1))

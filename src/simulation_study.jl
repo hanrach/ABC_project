@@ -37,17 +37,34 @@ true_p_dist=(Gamma(2,1),Gamma(1,1))
 true_p = map(x -> rand(x),true_p_dist)
 y = data_generator(true_p)
 # add noise
-y = y + rand(LogNormal(0,0.5),size(y))
+print(size(y))
 
 output=ABC_MCMC(y, data_generator, algo_parameters, 0, 100)
 
 # Bayesian Calibration
 algo_list = (ABC=ABC,ABC_MCMC=ABC_MCMC)
 algo_parameter_ABC = (prior = (Gamma(2,1),Gamma(1,1)),epsilon = 10,eta = identity_mapping, d = compute_norm)
-algo_parameter_mcmc = (prior = (Gamma(2,1),Gamma(1,1)),epsilon = 10, eta = identity_mapping,
-                        d= compute_norm, kernel = random_walk, sd = (0.5,0.5),
-                        thinning = 10)
+algo_parameter_mcmc = (prior = (Gamma(2,1),Gamma(1,1)),epsilon = 1, eta = identity_mapping,
+                        d= compute_norm, kernel = random_walk, sd = (0.25,0.25),
+                        thinning = 100)
 algo_param_list = (ABC = algo_parameter_ABC,
                    ABC_MCMC = algo_parameter_mcmc)
 
-look = BayesianCalibration(1000,0.0,Int(500),0.10,algo_list,algo_param_list)
+
+look = BayesianCalibration(100,0.0,Int(500),0.10,algo_list,algo_param_list)
+
+# calibration
+alpha_level = 0.5
+print(mean(look[2],dims=1))
+index = 4
+print(look[2][index,:])
+histogram(look[3][index,:,1,1],alpha=alpha_level)
+histogram!(look[3][index,:,1,2],alpha=alpha_level)
+vline!([look[1][1][index]])
+# histogram!(rand(Gamma(2,1),500),alpha=alpha_level)
+histogram(look[3][index,:,2,1],alpha=alpha_level)
+histogram!(look[3][index,:,2,2],alpha=alpha_level)
+vline!([look[1][2][index]])
+# histogram!(rand(Gamma(1,1),500),alpha=alpha_level)
+
+compute_posterior(look[3][index,:,1,2],0.10)
