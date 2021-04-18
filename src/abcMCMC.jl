@@ -1,9 +1,3 @@
-using DifferentialEquations
-using Distributions
-using Random
-using Printf
-include("sir_ode.jl")
-include("utils.jl")
 # y: data
 # yhat_generator: function that samples data given the parameters
 # algo parameters: Namedtuple of algorithm parameters
@@ -11,9 +5,9 @@ include("utils.jl")
 # N_samples: number of samples desired
 function ABC_MCMC(y,yhat_generator,algo_parameters,max_time,N_samples)
 
-    
+
     kernel = algo_parameters[:kernel]
-    sd = (0.2,0.2)
+    sd = algo_parameters[:sd]
     eta_y = algo_parameters[:eta](y)
     q = length(algo_parameters[:prior])
     result = zeros(N_samples,q)
@@ -38,9 +32,9 @@ function ABC_MCMC(y,yhat_generator,algo_parameters,max_time,N_samples)
         yhat = yhat_generator( map(x->exp(x),log_p_cand))
         # yhat = yhat_generator( p_cand)
         dist = algo_parameters[:d](eta_y, algo_parameters[:eta](yhat))
-        
+
         u = rand(Uniform(0,1))
-        
+
         kernel_cand_prev = sum(kernel(log_p_prev, sd )[2])
         kernel_prev_cand = sum(kernel(log_p_cand, sd)[2])
         # kernel_cand_prev = sum(kernel(p_prev, sd )[2])
@@ -52,7 +46,7 @@ function ABC_MCMC(y,yhat_generator,algo_parameters,max_time,N_samples)
         alpha = prior_cand + kernel_cand_prev - (prior_prev + kernel_prev_cand)
         # @printf("log u = %f, alpha = %f \n", log(u), alpha)
         # @printf("dist = %f\n", dist)
-        
+
         if (i % thinning_interval==0)
             if (log(u) < alpha && dist < algo_parameters[:epsilon])
                 for j in 1:q
@@ -74,21 +68,3 @@ function ABC_MCMC(y,yhat_generator,algo_parameters,max_time,N_samples)
     @printf("acceptance rate=%f\n", naccept/N_samples)
     return result
 end
-
-
-
-function data_generator(p)
-    initial_state = [99.0;1.0;0.0]; time_window=(0,10.0)
-    solve_ode(initial_state,time_window,p)
-end
-
-algo_parameters = (prior = (Gamma(2,1),Gamma(1,1)),epsilon = 25,
-eta= identity_mapping, d= distanceFunction, kernel=random_walk)
-
-true_p_dist=(Gamma(2,1),Gamma(1,1))
-true_p = map(x -> rand(x),true_p_dist)
-y = data_generator(true_p)
-# add noise
-y = y + rand(LogNormal(0,0.5),size(y))
-
-output=ABC_MCMC(y, data_generator, algo_parameters, 0, 100)
