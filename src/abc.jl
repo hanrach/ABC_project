@@ -13,7 +13,7 @@ function ABC(y,yhat_generator,algo_parameters,max_time,N_samples)
 
     while N < N_samples+1
         # sample parameters
-        p = map(x -> rand(x),algo_parameters[:prior])
+        p = rand.(algo_parameters[:prior])
         # generate sample
         yhat = yhat_generator(p)
         # check acceptance

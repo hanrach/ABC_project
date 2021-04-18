@@ -1,6 +1,6 @@
 using JLD
 using LinearAlgebra, DifferentialEquations, Distributions,Random
-using StatsPlots
+using Printf
 include("utils.jl")
 include("sir_ode.jl")
 include("abc.jl")

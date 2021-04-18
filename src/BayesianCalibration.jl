@@ -1,3 +1,7 @@
+# outputs I want
+# true parameter value list
+#
+
 # TODO: how to compute the posterior distribution of parameters in ABC
 function BayesianCalibration(N_experiments,max_time,N_samples,alpha,
     algo_list,algo_parameter_list;
@@ -10,18 +14,27 @@ function BayesianCalibration(N_experiments,max_time,N_samples,alpha,
     # num of algorithms
     N_algo = length(algo_list)
 
+    # N param
+    N_param = length(true_p_dist)
+
+    # list of param values
+    true_param = rand.(true_p_dist,N_experiments)
+
     # Calibration value
     res = zeros(N_experiments,N_algo)
 
+    # algo output
+    param_output = zeros(N_experiments,N_samples,N_param,N_algo)
+
     # data generator
     function data_generator(p)
-        solve_ode(initial_state,time_window,p)
+        ode_model(initial_state,time_window,p)
     end
 
     for i in 1:N_experiments
         # generate data
         # firt sample true SIR parameters
-        true_p = map(x -> rand(x),true_p_dist)
+        true_p = (true_param[1][i],true_param[2][i])
         # generate data
         y = data_generator(true_p)
         if add_noise
@@ -35,9 +48,14 @@ function BayesianCalibration(N_experiments,max_time,N_samples,alpha,
             # check whether parameters are contained in the 95% posterior dist
             # given independence both have to be contained
             res[i,algo_index] = all(map(ind -> check_in_interval(true_p[ind],compute_posterior(vec(output[:,ind]),alpha)),1:length(true_p)))
+
+            # save output
+            param_output[i,:,:,algo_index] = output
         end
     end
 
-    res
+    return(true_param = true_param,
+           calibration = res,
+           simulated_param = param_output)
 
 end
