@@ -10,10 +10,11 @@ function ABC_MCMC(y,yhat_generator,algo_parameters,max_time,N_samples)
     sd = algo_parameters[:sd]
     eta_y = algo_parameters[:eta](y)
     q = length(algo_parameters[:prior])
+    thinning_interval = algo_parameters[:thinning]
+
     result = zeros(N_samples,q)
     dist = Inf
     p_prev=(0,0)
-    thinning_interval = 10
 
     while (dist > algo_parameters[:epsilon])
         # sample parameters from prior
@@ -57,14 +58,14 @@ function ABC_MCMC(y,yhat_generator,algo_parameters,max_time,N_samples)
                     # result[i,j] = (p_cand[j])
                     # log_p_prev = p_cand
                 end
-                naccept +=1
+                naccept += 1
             else
                 for j in 1:q
                     result[k,j] = exp(log_p_prev[j])
                     # result[i,j] = (p_prev[j])
                 end
             end
-            k +=1
+            k += 1
         end
     end
     @printf("acceptance rate=%f\n", naccept/N_samples)

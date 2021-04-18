@@ -44,8 +44,10 @@ output=ABC_MCMC(y, data_generator, algo_parameters, 0, 100)
 # Bayesian Calibration
 algo_list = (ABC=ABC,ABC_MCMC=ABC_MCMC)
 algo_parameter_ABC = (prior = (Gamma(2,1),Gamma(1,1)),epsilon = 10,eta = identity_mapping, d = compute_norm)
-algo_parameter_mcmc = (prior = (Gamma(2,1),Gamma(1,1)),epsilon = 10, eta = identity_mapping, d= compute_norm, kernel = random_walk, sd = (0.5,0.5))
+algo_parameter_mcmc = (prior = (Gamma(2,1),Gamma(1,1)),epsilon = 10, eta = identity_mapping,
+                        d= compute_norm, kernel = random_walk, sd = (0.5,0.5),
+                        thinning = 10)
 algo_param_list = (ABC = algo_parameter_ABC,
                    ABC_MCMC = algo_parameter_mcmc)
 
-look = BayesianCalibration(10,0.0,Int(1000),0.10,algo_list,algo_param_list)
+look = BayesianCalibration(1000,0.0,Int(500),0.10,algo_list,algo_param_list)

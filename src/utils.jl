@@ -15,7 +15,7 @@ function identity_mapping(y)
 end
 
 function compute_norm(y,yhat;p=2)
-    norm(y - yhat, p)/size(y)[1]
+    norm(y[2:3,2:end] - yhat[2:3,2:end], p)/size(y)[1]
 end
 
 function random_walk(p_prev, sd)
