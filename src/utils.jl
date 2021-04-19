@@ -26,3 +26,13 @@ function random_walk(p_prev, sd)
     log_pdf = map( (x,y,z) -> logpdf((Normal(x,z)), y ), p_prev, p_propose, sd )
     return p_propose, log_pdf
 end
+
+function random_walk(p_prev, sd)
+    # return proposed p, log(q(p_n+1|p_n))
+    p_propose = map( (x,y) -> x + rand(Normal(0,y)), p_prev, sd)
+    return p_propose
+end
+
+function random_walk_density(p1, p2, sd)
+    return map( (x,y,z) -> pdf(LogNormal(x,z),y), p1, p2, sd )
+end
