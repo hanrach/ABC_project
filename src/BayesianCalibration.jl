@@ -1,7 +1,6 @@
 # outputs I want
 # true parameter value list
 #
-
 # TODO: how to compute the posterior distribution of parameters in ABC
 function BayesianCalibration(N_experiments,max_time,N_samples,alpha,
     algo_list,algo_parameter_list;
@@ -10,6 +9,9 @@ function BayesianCalibration(N_experiments,max_time,N_samples,alpha,
     time_window=(0,10.0),
     add_noise = false,
     true_p_dist=(Gamma(2,1),Gamma(1,1)))
+
+    # initial pop
+    s0 = sum(initial_state)
 
     # num of algorithms
     N_algo = length(algo_list)
@@ -28,7 +30,12 @@ function BayesianCalibration(N_experiments,max_time,N_samples,alpha,
 
     # data generator
     function data_generator(p)
-        ode_model(initial_state,time_window,p)
+        y = ode_model(initial_state,time_window,p)
+        if add_noise
+            y = y + rand(LogNormal(0,0.5),size(y))
+            y = y ./ sum(y,dims=1) * s0
+        end
+        y
     end
 
     for i in 1:N_experiments
@@ -37,9 +44,6 @@ function BayesianCalibration(N_experiments,max_time,N_samples,alpha,
         true_p = (true_param[1][i],true_param[2][i])
         # generate data
         y = data_generator(true_p)
-        if add_noise
-            y = y + rand(LogNormal(0,0.5),size(y))
-        end
 
         # iterate over algos
         for algo_index in 1:N_algo

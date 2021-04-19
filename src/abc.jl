@@ -6,22 +6,30 @@
 function ABC(y,yhat_generator,algo_parameters,max_time,N_samples)
 
     # TODO: implement max_time
-    N = 1
     eta_y = algo_parameters[:eta](y)
     q = length(algo_parameters[:prior])
     result = zeros(N_samples,q)
 
-    while N < N_samples+1
+    i = 1
+
+    while i <= N_samples
         # sample parameters
-        p = rand.(algo_parameters[:prior])
+        p = rand.(algo_parameters[:prior]
+        
         # generate sample
         yhat = yhat_generator(p)
+
+        # in case there is no soln given the parameters
+        if size_y != size(yhat)
+            continue
+        end
+
         # check acceptance
         if algo_parameters[:d](eta_y,algo_parameters[:eta](yhat)) < algo_parameters[:epsilon]
             for j in 1:q
-                result[N,j] = p[j]
+                result[i,j] = p[j]
             end
-            N += 1
+            i += 1
         end
 
     end
