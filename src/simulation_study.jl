@@ -32,7 +32,7 @@ density(output[:,2], xlabel="Paramter value γ")
 algo_parameter_mcmc = (prior = (Gamma(2,1),Gamma(1,1)),epsilon = 25, eta = identity_mapping,
                         d= compute_norm, proposal = proposal_Normal,
                         proposalRatio = proposalRatio_Normal,sd = (0.25,0.25),
-                        thinning = 100, verbose=true)
+                        thinning = 100, burn_in = 100,verbose=true)
 
 true_p_dist=(Gamma(2,1),Gamma(1,1))
 true_p = map(x -> rand(x),true_p_dist)

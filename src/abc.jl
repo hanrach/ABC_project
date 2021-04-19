@@ -9,12 +9,12 @@ function ABC(y,yhat_generator,algo_parameters,max_time,N_samples)
     eta_y = algo_parameters[:eta](y)
     q = length(algo_parameters[:prior])
     result = zeros(N_samples,q)
-
+    size_y = size(y)
     i = 1
 
     while i <= N_samples
         # sample parameters
-        p = rand.(algo_parameters[:prior]
+        p = rand.(algo_parameters[:prior])
         
         # generate sample
         yhat = yhat_generator(p)
