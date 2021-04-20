@@ -2,7 +2,7 @@
 # true parameter value list
 #
 # TODO: how to compute the posterior distribution of parameters in ABC
-function BayesianCalibration(N_experiments,max_time,N_samples,alpha,
+function BayesianCalibration(N_experiments,N_samples,alpha,
     algo_list,algo_parameter_list;
     ode_model = solve_ode,
     initial_state = [99.0;1.0;0.0],
@@ -28,6 +28,15 @@ function BayesianCalibration(N_experiments,max_time,N_samples,alpha,
     # algo output
     param_output = zeros(N_experiments,N_samples,N_param,N_algo)
 
+    # algo time
+    cputime_output = zeros(N_experiments, N_algo)
+
+    # ess
+    ess_output = zeros(N_experiments,N_algo)
+
+    # ess per unit time
+    ess_output_time = copy(ess_output)
+
     # data generator
     function data_generator(p)
         y = ode_model(initial_state,time_window,p)
@@ -48,18 +57,26 @@ function BayesianCalibration(N_experiments,max_time,N_samples,alpha,
         # iterate over algos
         for algo_index in 1:N_algo
             # perform algo
-            output = algo_list[algo_index](y,data_generator,algo_parameter_list[algo_index],max_time,N_samples)
+            output, cpu_time = algo_list[algo_index](y,data_generator,algo_parameter_list[algo_index],N_samples)
             # check whether parameters are contained in the 95% posterior dist
             # given independence both have to be contained
+
             res[i,algo_index] = all(map(ind -> check_in_interval(true_p[ind],compute_posterior(vec(output[:,ind]),alpha)),1:length(true_p)))
 
             # save output
             param_output[i,:,:,algo_index] = output
+            cputime_output[i,algo_index] =  cpu_time
+            # use R's package mcmcse to compute ESS
+            # output = transpose(output)
+            ess_output[i,algo_index]  = try rcopy(R"mean(mcmcse::ess($output))") catch; 0 end
+            ess_output_time[i,algo_index]  = ess_output[i,algo_index] / cpu_time
         end
     end
 
     return(true_param = true_param,
            calibration = res,
-           simulated_param = param_output)
-
+           simulated_param = param_output,
+           cpu_time = cputime_output,
+           ess = ess_output,
+           ess_time = ess_output_time)
 end

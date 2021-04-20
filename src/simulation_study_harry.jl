@@ -4,8 +4,10 @@ using Distributions
 using Random
 using Printf
 using Plots
+using RCall
+using CPUTime
 # using StatsPlots
-include("utils.jl")
+include("utils_harry.jl")
 include("sir_ode.jl")
 include("abc.jl")
 include("abcMCMC.jl")
@@ -23,7 +25,8 @@ eta= identity_mapping, d= distanceFunction)
 true_p_dist=(Gamma(2,1),Gamma(1,1))
 true_p = map(x -> rand(x),true_p_dist)
 y = data_generator(true_p)
-output=ABC(y, data_generator, algo_parameters, 0, 20)
+
+output, cpu_time=ABC(y, data_generator, algo_parameters,20)
 
 density(output[:,1], xlabel="Paramter value β")
 density(output[:,2], xlabel="Paramter value γ")
@@ -52,7 +55,7 @@ algo_parameter_mcmc = (prior = (Gamma(2,1),Gamma(1,1)),epsilon = 5, eta = identi
 algo_param_list = (ABC = algo_parameter_ABC,
                    ABC_MCMC = algo_parameter_mcmc)
 
-look = BayesianCalibration(100,0.0,Int(500),0.10,algo_list,algo_param_list,time_window=(0.0,10.0))
+look = BayesianCalibration(2,Int(500),0.10,algo_list,algo_param_list,time_window=(0.0,10.0))
 
 # calibration
 alpha_level = 0.5
@@ -67,3 +70,12 @@ histogram(look[3][index,:,2,1],alpha=alpha_level)
 histogram!(look[3][index,:,2,2],alpha=alpha_level)
 vline!([look[1][2][index]])
 # histogram!(rand(Gamma(1,1),500),alpha=alpha_level)
+
+# cpu time
+look[4]
+
+# ess
+look[5]
+
+# ess per unit time
+look[6]

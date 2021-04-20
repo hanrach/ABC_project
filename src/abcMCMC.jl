@@ -1,10 +1,9 @@
 # y: data
 # yhat_generator: function that samples data given the parameters
 # algo parameters: Namedtuple of algorithm parameters
-# max_time: max time allowed for the algo
 # N_samples: number of samples desired
-function ABC_MCMC(y,yhat_generator,algo_parameters,max_time,N_samples)
-
+function ABC_MCMC(y,yhat_generator,algo_parameters,N_samples)
+    CPUtic()
 
     proposal = algo_parameters[:proposal]
     proposalRatio = algo_parameters[:proposalRatio]
@@ -79,5 +78,7 @@ function ABC_MCMC(y,yhat_generator,algo_parameters,max_time,N_samples)
     if algo_parameters[:burn_in] > 0
         result = result[(1+algo_parameters[:burn_in]):end,:]
     end
-    return result
+    t_end = CPUtoc_modified(false)
+
+    return result,t_end
 end

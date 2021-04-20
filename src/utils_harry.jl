@@ -50,3 +50,11 @@ end
 function proposalRatio_Normal(p_prev,p_cand,sd)
     1
 end
+
+function CPUtoc_modified(verbose)
+    t = CPUTime.CPUtoq()
+    if verbose
+        println("elpased CPU time: ",t," seconds")
+    end
+    return t
+end

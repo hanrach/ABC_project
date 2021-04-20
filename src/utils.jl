@@ -55,4 +55,3 @@ end
 function proposalRatio_Normal(p_prev,p_cand,sd)
     1
 end
-
