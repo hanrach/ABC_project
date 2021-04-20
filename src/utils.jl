@@ -28,7 +28,7 @@ function random_walk(p_prev, sd)
 end
 
 
-function random_walk_density(p1, p2, sd)
+function proposal_Normal_density(p1, p2, sd)
     return map( (x,y,z) -> pdf(Normal(x,z),y), p1, p2, sd )
 end
 

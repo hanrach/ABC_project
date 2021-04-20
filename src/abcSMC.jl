@@ -33,14 +33,19 @@ function ABC_SMC(y,yhat_generator,algo_parameters,max_time,N_samples)
 
     while (t < time_final)
         nParticle=1
+        p_cand = (0,0)
         while nParticle <= N_samples
             # sample the index with with weights
             sampled_index = wsample(1:N_samples,weights,1)
             p_star = Tuple(result[sampled_index,:])
             # propose candidate parameter from the kernel
-            p_cand = kernel(p_star, sd)
+            valid = true
+            while valid
+                p_cand = kernel(p_star, sd)
+                valid = any(p_cand .< 0)
+            end
             # if the density  of the prior at proposed param is 0, start again
-            prior_cand = prod(map( (x,y)->pdf(x,y), algo_parameters[:prior], p_cand ))
+            prior_cand = prod(pdf.(algo_parameters[:prior],p_cand))
             if prior_cand == 0
                 continue
             end
