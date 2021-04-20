@@ -1,5 +1,10 @@
 using JLD
-using LinearAlgebra, DifferentialEquations, Distributions,Random
+using DataFrames
+using Dates
+using LinearAlgebra
+using DifferentialEquations
+using Distributions
+using Random
 using Printf
 include("utils.jl")
 include("sir_ode.jl")
