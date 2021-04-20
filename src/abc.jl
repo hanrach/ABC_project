@@ -21,10 +21,12 @@ function ABC(y,yhat_generator,algo_parameters,max_time,N_samples)
 
         # in case there is no soln given the parameters
         if size_y != size(yhat)
+            
             continue
         end
 
         # check acceptance
+    
         if algo_parameters[:d](eta_y,algo_parameters[:eta](yhat)) < algo_parameters[:epsilon]
             for j in 1:q
                 result[i,j] = p[j]

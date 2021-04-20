@@ -44,7 +44,7 @@ output = ABC_MCMC(y, data_generator, algo_parameter_mcmc, 0, 100)
 
 
 # test ABC_SMC
-algo_parameters_smc = (prior = (Gamma(2,1),Gamma(1,1)), time_final=10, eps_list = [25, 20, 18, 15, 12, 10, 8, 5, 4, 2.5],
+algo_parameters_smc = (prior = (Gamma(2,1),Gamma(1,1)), time_final=9, eps_list = [25, 20, 18, 15, 12, 10, 8, 5, 4],
 eta= identity_mapping, d= distanceFunction, kernel=proposal_Normal, 
 kernel_density=proposal_Normal_density,
 sd=(0.5,0.5))
@@ -68,7 +68,7 @@ algo_param_list = (ABC = algo_parameter_ABC,
                    ABC_MCMC = algo_parameter_mcmc,
                    ABC_SMC = algo_parameters_smc)
 
-look = BayesianCalibration(10,0.0,Int(500),0.10,algo_list,algo_param_list,time_window=(0.0,10.0))
+look = BayesianCalibration(100,0.0,Int(500),0.10,algo_list,algo_param_list,time_window=(0.0,10.0))
 
 # calibration
 alpha_level = 0.5
