@@ -18,7 +18,6 @@ function compute_norm(y,yhat;p=2)
     norm(y[2:3,2:end] - yhat[2:3,2:end], p)/size(y)[1]
 end
 
-
 function random_walk(p_prev, sd)
     # return proposed p, log(q(p_n+1|p_n))
 
@@ -28,17 +27,12 @@ function random_walk(p_prev, sd)
     return p_propose, log_pdf
 end
 
-
-function proposal_Normal_density(p1, p2, sd)
-    return map( (x,y,z) -> pdf(Normal(x,z),y), p1, p2, sd )
-end
-
 function proposal_LN(log_p_prev,sd)
     log_p_prev .+ rand.(Normal.(0,sd))
 end
 
 function proposalRatio_LN(p_prev,p_cand,sd)
-    0.5
+    #TODO
 end
 
 function proposal_Gamma(log_p_prev,k)
@@ -57,21 +51,10 @@ function proposalRatio_Normal(p_prev,p_cand,sd)
     1
 end
 
-function systematic_resampling(weights)
-    N = length(weights)
-    partitions = rand()/N .+ (1:1:N)./N
-    idx = zeros(N)
-    Q = cumsum(weights)
-    i=1;j=1;
-    while i<=N
-        if partitions[i] < Q[j]
-            idx[i]=j
-            i +=1
-        else
-            j+=1
-        end
+function CPUtoc_modified(verbose)
+    t = CPUTime.CPUtoq()
+    if verbose
+        println("elpased CPU time: ",t," seconds")
     end
-    return idx
+    return t
 end
-
-

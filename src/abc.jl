@@ -3,7 +3,8 @@
 # algo parameters: Namedtuple of algorithm parameters
 # max_time: max time allowed for the algo
 # N_samples: number of samples desired
-function ABC(y,yhat_generator,algo_parameters,max_time,N_samples)
+function ABC(y,yhat_generator,algo_parameters,N_samples)
+    CPUtic()
 
     # TODO: implement max_time
     eta_y = algo_parameters[:eta](y)
@@ -15,7 +16,7 @@ function ABC(y,yhat_generator,algo_parameters,max_time,N_samples)
     while i <= N_samples
         # sample parameters
         p = rand.(algo_parameters[:prior])
-        
+
         # generate sample
         yhat = yhat_generator(p)
 
@@ -35,6 +36,6 @@ function ABC(y,yhat_generator,algo_parameters,max_time,N_samples)
         end
 
     end
-
-    return result
+    t_end = CPUtoc_modified(false)
+    return result, t_end
 end
