@@ -57,3 +57,20 @@ function proposalRatio_Normal(p_prev,p_cand,sd)
     1
 end
 
+function systematic_resampling(weights)
+    N = length(weights)
+    partitions = rand()/N .+ (1:1:N)./N
+    idx = zeros(N)
+    Q = cumsum(weights)
+    i=1;j=1;
+    while i<=N
+        if partitions[i] < Q[j]
+            idx[i]=j
+            i +=1
+        else
+            j+=1
+        end
+    end
+    return idx
+end
+

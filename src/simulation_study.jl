@@ -44,7 +44,7 @@ output = ABC_MCMC(y, data_generator, algo_parameter_mcmc, 0, 100)
 
 
 # test ABC_SMC
-algo_parameters_smc = (prior = (Gamma(2,1),Gamma(1,1)), time_final=9, eps_list = [25, 20, 18, 15, 12, 10, 8, 5, 4],
+algo_parameters_smc = (prior = (Gamma(2,1),Gamma(1,1)), time_final=5, eps_list = [30, 25, 20, 15, 10],
 eta= identity_mapping, d= distanceFunction, kernel=proposal_Normal, 
 kernel_density=proposal_Normal_density,
 sd=(0.5,0.5))
@@ -53,14 +53,14 @@ output = ABC_SMC(y, data_generator, algo_parameters_smc, 0, 100)
 
 
 # Bayesian Calibration
-algo_list = (ABC=ABC,ABC_MCMC=ABC_MCMC, ABC_SMC=ABC_SMC)
+algo_list = (ABC=ABC, ABC_MCMC=ABC_MCMC, ABC_SMC=ABC_SMC)
 algo_parameter_ABC = (prior = (Gamma(2,1),Gamma(1,1)),epsilon = 10,eta = identity_mapping, d = compute_norm)
 algo_parameter_mcmc = (prior = (Gamma(2,1),Gamma(1,1)),epsilon = 10, eta = identity_mapping,
                         d= compute_norm, proposal = proposal_Normal,
                         proposalRatio = proposalRatio_Normal,sd = (0.25,0.25),
                         thinning = 100, verbose=true,
                         burn_in = 100)
-algo_parameters_smc = (prior = (Gamma(2,1),Gamma(1,1)), time_final=5, eps_list = [25, 20, 15, 5, 2.5],
+algo_parameters_smc = (prior = (Gamma(2,1),Gamma(1,1)), time_final=5, eps_list = [30, 25, 20, 15, 10],
                         eta= identity_mapping, d= distanceFunction, kernel=proposal_Normal, 
                         kernel_density=proposal_Normal_density,
                         sd=(0.25,0.25))

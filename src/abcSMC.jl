@@ -5,6 +5,7 @@
 # N_samples: number of samples desired
 function ABC_SMC(y,yhat_generator,algo_parameters,max_time,N_samples)
 
+    resample_method = algo_parameters[:resample_method]
     kernel = algo_parameters[:kernel]
     kernel_density = algo_parameters[:kernel_density]
     sd = algo_parameters[:sd]
@@ -14,6 +15,8 @@ function ABC_SMC(y,yhat_generator,algo_parameters,max_time,N_samples)
     eps_list = algo_parameters[:eps_list]
     time_final = algo_parameters[:time_final]
 
+    ess_list = zeros(time_final)
+    ess_threshold = N_samples/2
     result = zeros(N_samples,q)
     weights = ones(N_samples)./N_samples
     theta = zeros(N_samples,q)
@@ -28,15 +31,17 @@ function ABC_SMC(y,yhat_generator,algo_parameters,max_time,N_samples)
             nParticle +=1
         end
     end
+    ess_list[t] = 1/(sum(weights.^2))
+    t += 1
 
     result_prev = result
-
-    while (t < time_final)
+    weights_prev = weights
+    while (t <= time_final)
         nParticle=1
         p_cand = (0,0)
         while nParticle <= N_samples
             # sample the index with with weights
-            sampled_index = wsample(1:N_samples,weights,1)
+            sampled_index = wsample(1:N_samples,weights_prev,1)
             p_star = Tuple(result[sampled_index,:])
             # propose candidate parameter from the kernel
             valid = true
@@ -56,18 +61,27 @@ function ABC_SMC(y,yhat_generator,algo_parameters,max_time,N_samples)
                 # Compute the weight of the current particle
                 weight_denom = 0
                 for j=1:N_samples
-                    weight_denom += weights[j]*prod(map((x,y,z) -> kernel_density(x,y,z), Tuple(result_prev[j,:]), p_cand, sd ))
+                    weight_denom += weights_prev[j]*prod((kernel_density.(Tuple(result_prev[j,:]), p_cand, sd) ))
                 end
                 weights[nParticle] = prior_cand/weight_denom
-                # Normalize weights
-                weights = weights./sum(weights)
                 nParticle+=1
             end
+
         end
-        
+        # Normalize weights
+        weights = weights./sum(weights)
+        # Compute effective sample size
+        ess = 1/sum(weights.^2)
+        ess_list[t] = ess
+        # resample if the effective sample size is below the threshold
+        if ess < ess_threshold
+            idx = resample_method(weights)
+            
+        end
         result_prev = result
         t += 1
     end
-   
+    @show ess_list
+    @printf("Done SMC\n")
     return result
 end
