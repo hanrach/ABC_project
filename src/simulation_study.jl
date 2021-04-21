@@ -4,6 +4,8 @@ using Distributions
 using Random
 using Printf
 using Plots
+using RCall
+using CPUTime
 # using StatsPlots
 include("utils.jl")
 include("sir_ode.jl")
@@ -24,7 +26,7 @@ eta= identity_mapping, d= distanceFunction)
 true_p_dist=(Gamma(2,1),Gamma(1,1))
 true_p = map(x -> rand(x),true_p_dist)
 y = data_generator(true_p)
-output=ABC(y, data_generator, algo_parameters, 0, 20)
+output,t_end=ABC(y, data_generator, algo_parameters, 20)
 
 using StatsPlots
 density(output[:,1], xlabel="Paramter value β")
@@ -40,16 +42,15 @@ true_p_dist=(Gamma(2,1),Gamma(1,1))
 true_p = map(x -> rand(x),true_p_dist)
 y = data_generator(true_p)
 
-output = ABC_MCMC(y, data_generator, algo_parameter_mcmc, 0, 100)
+output, t_end = ABC_MCMC(y, data_generator, algo_parameter_mcmc,100)
 
 
 # test ABC_SMC
 
 algo_parameters_smc = (prior = (Gamma(2,1),Gamma(1,1)), time_final=5, eps_list = [30, 25, 20, 15, 10],
 eta= identity_mapping, d= distanceFunction, kernel=proposal_Normal, 
-
 kernel_density=proposal_Normal_density,
-sd=(0.5,0.5))
+sd=(0.5,0.5), resample_method=systematic_resample)
 
 output = ABC_SMC(y, data_generator, algo_parameters_smc, 0, 100)
 

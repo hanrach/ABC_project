@@ -57,10 +57,10 @@ function proposalRatio_Normal(p_prev,p_cand,sd)
     1
 end
 
-function systematic_resampling(weights)
+function systematic_resample(weights)
     N = length(weights)
-    partitions = rand()/N .+ (1:1:N)./N
-    idx = zeros(N)
+    partitions = rand()/N .+ (0:1:N-1)./N
+    idx = zeros(Int,N)
     Q = cumsum(weights)
     i=1;j=1;
     while i<=N
@@ -74,4 +74,11 @@ function systematic_resampling(weights)
     return idx
 end
 
+function CPUtoc_modified(verbose)
+    t = CPUTime.CPUtoq()
+    if verbose
+        println("elpased CPU time: ",t," seconds")
+    end
+    return t
+end
 

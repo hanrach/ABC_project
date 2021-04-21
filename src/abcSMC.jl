@@ -3,8 +3,8 @@
 # algo parameters: Namedtuple of algorithm parameters
 # max_time: max time allowed for the algo
 # N_samples: number of samples desired
-function ABC_SMC(y,yhat_generator,algo_parameters,max_time,N_samples)
-
+function ABC_SMC(y,yhat_generator,algo_parameters,N_samples)
+    CPUtic()
     resample_method = algo_parameters[:resample_method]
     kernel = algo_parameters[:kernel]
     kernel_density = algo_parameters[:kernel_density]
@@ -16,7 +16,7 @@ function ABC_SMC(y,yhat_generator,algo_parameters,max_time,N_samples)
     time_final = algo_parameters[:time_final]
 
     ess_list = zeros(time_final)
-    ess_threshold = N_samples/2
+    ess_threshold = Int(N_samples*0.6)
     result = zeros(N_samples,q)
     weights = ones(N_samples)./N_samples
     theta = zeros(N_samples,q)
@@ -76,12 +76,13 @@ function ABC_SMC(y,yhat_generator,algo_parameters,max_time,N_samples)
         # resample if the effective sample size is below the threshold
         if ess < ess_threshold
             idx = resample_method(weights)
-            
+            result = result[idx,:]
         end
         result_prev = result
         t += 1
     end
+    t_end = CPUtoc_modified(false)
     @show ess_list
     @printf("Done SMC\n")
-    return result
+    return result, t_end
 end
