@@ -71,6 +71,10 @@ function BayesianCalibration(N_experiments,N_samples,alpha,
             ess_output[i,algo_index]  = try rcopy(R"mean(mcmcse::ess($output))") catch; 0 end
             ess_output_time[i,algo_index]  = ess_output[i,algo_index] / cpu_time
         end
+
+        if i % 100 == 0
+            @show(i)
+        end
     end
 
     return(true_param = true_param,

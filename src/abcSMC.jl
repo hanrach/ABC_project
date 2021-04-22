@@ -14,6 +14,7 @@ function ABC_SMC(y,yhat_generator,algo_parameters,N_samples)
     q = length(algo_parameters[:prior])
     eps_list = algo_parameters[:eps_list]
     time_final = algo_parameters[:time_final]
+    verbose = algo_parameters[:verbose]
 
     ess_list = zeros(time_final)
     ess_threshold = Int(N_samples*0.6)
@@ -82,7 +83,9 @@ function ABC_SMC(y,yhat_generator,algo_parameters,N_samples)
         t += 1
     end
     t_end = CPUtoc_modified(false)
-    @show ess_list
-    @printf("Done SMC\n")
+    if verbose
+        @show ess_list
+        @printf("Done SMC\n")
+    end
     return result, t_end
 end
