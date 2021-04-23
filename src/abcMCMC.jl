@@ -16,7 +16,7 @@ function ABC_MCMC(y,yhat_generator,algo_parameters,N_samples)
     result = zeros(N_samples,q)
     dist = Inf
     p_prev=(0,0)
-
+    
     # initial point using ABC
     while (dist > algo_parameters[:epsilon])
         p_prev = rand.(algo_parameters[:prior])
@@ -60,7 +60,6 @@ function ABC_MCMC(y,yhat_generator,algo_parameters,N_samples)
         log_prior_cand = sum(logpdf.(algo_parameters[:prior], p_cand))
 
         log_alpha = log_prior_cand + sum(log.(proposal_ratio)) - log_prior_prev
-
         if (i % thinning_interval==0)
             if (log(u) < log_alpha && dist < algo_parameters[:epsilon])
                 result[k,:] .= p_cand

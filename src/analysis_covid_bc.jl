@@ -5,38 +5,77 @@ using LinearAlgebra
 using DifferentialEquations
 using Distributions
 using Random
-
+using CSV
 using Printf
+using RCall
+using CPUTime
+using StatsPlots
 include("utils.jl")
 include("sir_ode.jl")
 include("abc.jl")
 include("abcMCMC.jl")
+include("abcSMC.jl")
 include("BayesianCalibration.jl")
 
-master_data = load("../data/covid_bc.jld")
+df_pre = DataFrame(CSV.File("../data/covid19_bc_pre_vaccine.csv"))
+df_post = DataFrame(CSV.File("../data/covid19_bc_post_vaccine.csv"))
 
-df_pre = master_data["pre"]
-df_post = master_data["post"]
+# """ Pre-vaccine analysis """
+tot_days = size(df_pre)[1]
+time_interval = 7
 
-""" Pre-vaccine analysis """
-days =30
-y_pre = hcat([df_pre[!,"S"],df_pre[!,"I"],df_pre[!,"R"]]...)[1:days,:]
+y_pre = hcat([df_pre[:S],df_pre[:I],df_pre[:R]]...)[1:7:tot_days,:]
+y_pre = y_pre./1e4
 # test ABC
-function data_generator(p)
-    initial_state = y_pre[1,:]; time_window=(0,Float64(days)-1)
+function data_generator_day(p)
+    initial_state = y_pre[1,:]; time_window=(1,Float64(tot_days))
+    solve_ode(initial_state,time_window,p,Float64(7))
+end
+
+# test ABC
+function data_generator_week(p)
+    initial_state = y_pre[1,:]; time_window=(1,Float64(tot_days)/time_interval)
     solve_ode(initial_state,time_window,p)
 end
 
-algo_parameters = (prior = (Gamma(2,1),Gamma(1,1)),epsilon = 1e6,
+algo_parameters_abc = (prior = (Truncated(Normal(0.1,0.5),0,Inf),Truncated(Normal(0.2,0.2),0,Inf)),epsilon = 0.1,
 eta= identity_mapping, d= distanceFunction)
 
-output_abc=ABC(y_pre', data_generator, algo_parameters, 0, 20)
-density(output[:,1], xlabel="Paramter value β")
-density(output[:,2], xlabel="Paramter value γ")
+output_abc=ABC(y_pre', data_generator_week, algo_parameters_abc, 500)
 
-p_output = (mode(output_abc[:,1]), 1.644)
-solution = solve_ode(y_pre[1,:], (0,Float64(days)), p_output )
+algo_parameter_mcmc = (prior = (Truncated(Normal(0.1,0.5),0,Inf),Truncated(Normal(0.2,0.2),0,Inf)),epsilon = 1, eta = identity_mapping,
+                        d= compute_norm, proposal = proposal_Normal,
+                        proposalRatio = proposalRatio_Normal,sd = (0.25,0.25),
+                        thinning = 100, burn_in=100, verbose=true)
 
-plot(solution, yaxis=:log, label = ["s_model" "i_model" "r_model"]); 
-plot!(y_pre, yaxis=:log, label=["s" "i" "r"], seriestype=:scatter)
-display(gcf())
+output_mcmc = ABC_MCMC(y_pre', data_generator_week, algo_parameter_mcmc, 500)
+
+
+algo_parameters_smc = (prior = (Truncated(Normal(0.1,0.5),0,Inf),Truncated(Normal(0.2,0.2),0,Inf)), time_final=5, eps_list = [10, 5, 1, 0.5, 0.1],
+eta= identity_mapping, d= distanceFunction, kernel=proposal_Normal, 
+kernel_density=proposal_Normal_density,
+sd=(0.5,0.5), resample_method=systematic_resample, verbose=true)
+
+output_smc = ABC_SMC(y_pre', data_generator_week, algo_parameters_smc, 500)
+
+alpha_level=1
+beta_plot = density(output_abc[1][:,1],alpha=alpha_level, label="ABC",  title="Predicted β Posterior", xlabel="β", ylabel="Density")
+density!(output_mcmc[1][:,1],alpha=alpha_level, label="ABC-MCMC")
+density!(output_smc[1][:,1],alpha=alpha_level, label="ABC-SMC")
+savefig(beta_plot,"../figs/beta_plot.png")
+
+gamma_plot = density(output_abc[1][:,2],alpha=alpha_level, label="ABC",  title="Predicted γ Posterior", xlabel="γ", ylabel="Density")
+density!(output_mcmc[1][:,2],alpha=alpha_level, label="ABC-MCMC")
+density!(output_smc[1][:,2],alpha=alpha_level, label="ABC-SMC")
+savefig(gamma_plot,"../figs/gamma_plot.png")
+# solution_day = data_generator_day((0.042,0.07))
+# solution_week = data_generator_week((0.12,0.2))
+
+# plot(solution_day[2:end], yaxis=:log, label = ["s_model" "i_model" "r_model"], title="Daily:β=0.042, γ=0.07"); 
+# plot!(1:7:250, y_pre, yaxis=:log, label=["s" "i" "r"], seriestype=:scatter)
+
+
+# plot(1:7:250,solution_week', yaxis=:log, label = ["s_model" "i_model" "r_model"], title="Weekly:β=0.2, γ=0.3"); 
+# plot!(1:7:250, y_pre, yaxis=:log, label=["s" "i" "r"], seriestype=:scatter)
+
+# plot(hcat([df_pre[:S],df_pre[:I],df_pre[:R]]...), yaxis=:log, label=["s" "i" "r"], seriestype=:scatter)
