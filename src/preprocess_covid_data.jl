@@ -40,3 +40,14 @@ CSV.write("data/covid19_bc_post_vaccine.csv",df_covid_BC_post)
 
 # save as JLD
 # save("data/covid_bc.jld","pre",df_covid_BC_pre,"post",df_covid_BC_post)
+
+# before vaccine is administered: Dec 2020
+df_covid_BC_second_wave = filter(:t => <(Date(2021,1,19)) ,df_covid_BC)
+
+# after vaccine
+df_covid_BC_third_wave = filter(:t => >=(Date(2021,3,19)),df_covid_BC)
+
+
+# save the output
+CSV.write("data/covid19_bc_second_wave.csv",df_covid_BC_second_wave)
+CSV.write("data/covid19_bc_third_wave.csv",df_covid_BC_third_wave)
