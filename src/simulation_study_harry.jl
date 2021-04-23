@@ -41,7 +41,7 @@ true_p_dist=(Gamma(2,1),Gamma(1,1))
 true_p = map(x -> rand(x),true_p_dist)
 y = data_generator(true_p)
 
-output = ABC_MCMC(y, data_generator, algo_parameter_mcmc, 0, 100)
+output = ABC_MCMC(y, data_generator, algo_parameter_mcmc, 100)
 
 
 # Bayesian Calibration

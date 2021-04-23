@@ -52,7 +52,7 @@ eta= identity_mapping, d= distanceFunction, kernel=proposal_Normal,
 kernel_density=proposal_Normal_density,
 sd=(0.5,0.5), resample_method=systematic_resample)
 
-output = ABC_SMC(y, data_generator, algo_parameters_smc, 0, 100)
+output = ABC_SMC(y, data_generator, algo_parameters_smc, 100)
 
 
 # Bayesian Calibration
@@ -72,7 +72,7 @@ algo_param_list = (ABC = algo_parameter_ABC,
                    ABC_MCMC = algo_parameter_mcmc,
                    ABC_SMC = algo_parameters_smc)
 
-look = BayesianCalibration(100,0.0,Int(500),0.10,algo_list,algo_param_list,time_window=(0.0,10.0))
+look = BayesianCalibration(100,Int(500),0.10,algo_list,algo_param_list,time_window=(0.0,10.0))
 
 # calibration
 alpha_level = 0.5
