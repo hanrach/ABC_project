@@ -26,6 +26,7 @@ time_interval = 7
 
 y_pre = hcat([df_pre[:S],df_pre[:I],df_pre[:R]]...)[1:7:tot_days,:]
 y_pre = y_pre./1e4
+y_dim = size(y_pre)[1]
 # test ABC
 function data_generator_day(p)
     initial_state = y_pre[1,:]; time_window=(1,Float64(tot_days))
@@ -40,7 +41,6 @@ end
 
 algo_parameters_abc = (prior = (Truncated(Normal(0.1,0.5),0,Inf),Truncated(Normal(0.2,0.2),0,Inf)),epsilon = 0.1,
 eta= identity_mapping, d= distanceFunction)
-
 output_abc=ABC(y_pre', data_generator_week, algo_parameters_abc, 500)
 
 algo_parameter_mcmc = (prior = (Truncated(Normal(0.1,0.5),0,Inf),Truncated(Normal(0.2,0.2),0,Inf)),epsilon = 1, eta = identity_mapping,
@@ -55,8 +55,21 @@ algo_parameters_smc = (prior = (Truncated(Normal(0.1,0.5),0,Inf),Truncated(Norma
 eta= identity_mapping, d= distanceFunction, kernel=proposal_Normal, 
 kernel_density=proposal_Normal_density,
 sd=(0.5,0.5), resample_method=systematic_resample, verbose=true)
-
 output_smc = ABC_SMC(y_pre', data_generator_week, algo_parameters_smc, 500)
+
+
+abc_solutions=zeros(3,y_dim,500)
+abc_mcmc_solutions=zeros(3,y_dim,500)
+abc_smc_solutions=zeros(3,y_dim,500)
+for i=1:500
+    abc_solutions[:,:,i] = data_generator_week(output_abc[1][i,:])[1:3,:]
+    abc_mcmc_solutions[:,:,i] = data_generator_week(output_mcmc[1][i,:])[1:3,:]
+    abc_smc_solutions[:,:,i] = data_generator_week(output_smc[1][i,:])[1:3,:]
+end
+
+save("../results/abc_solution_500.jld","abc_solutions",abc_solutions)
+save("../results/abc_mcmc_solution_500.jld","abc_mcmc_solutions",abc_mcmc_solutions)
+save("../results/abc_smc_solution_500.jld","abc_smc_solutions",abc_smc_solutions)
 
 alpha_level=1
 beta_plot = density(output_abc[1][:,1],alpha=alpha_level, label="ABC",  title="Predicted β Posterior", xlabel="β", ylabel="Density")
