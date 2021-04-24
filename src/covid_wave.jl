@@ -60,18 +60,31 @@ df_sthird_wave = DataFrame(CSV.File("../data/covid19_bc_third_wave.csv"))
      abc_smc_solutions[:,:,i] = data_generator_week_second_wave(output_smc[1][i,:])[1:3,:]
  end
  
- save("../results/abc_solution_500_secondwave.jld","abc_solutions",abc_solutions)
- save("../results/abc_mcmc_solution_500_secondwave.jld","abc_mcmc_solutions",abc_mcmc_solutions)
- save("../results/abc_smc_solution_500_secondwave.jld","abc_smc_solutions",abc_smc_solutions)
+ save("../results/covid/abc_solution_500_secondwave_2.jld","abc_solutions",abc_solutions)
+ save("../results/covid/abc_mcmc_solution_500_secondwave_2.jld","abc_mcmc_solutions",abc_mcmc_solutions)
+ save("../results/covid/abc_smc_solution_500_secondwave_2.jld","abc_smc_solutions",abc_smc_solutions)
  
+
  alpha_level=1
  beta_plot = density(output_abc[1][:,1],alpha=alpha_level, label="ABC",  title="Predicted β Posterior", xlabel="β", ylabel="Density")
  density!(output_mcmc[1][:,1],alpha=alpha_level, label="ABC-MCMC")
  density!(output_smc[1][:,1],alpha=alpha_level, label="ABC-SMC")
- savefig(beta_plot,"../figs/beta_plot_secondwave.png")
+ savefig(beta_plot,"../figs/beta_plot_secondwave_2.png")
  
  gamma_plot = density(output_abc[1][:,2],alpha=alpha_level, label="ABC",  title="Predicted γ Posterior", xlabel="γ", ylabel="Density")
  density!(output_mcmc[1][:,2],alpha=alpha_level, label="ABC-MCMC")
  density!(output_smc[1][:,2],alpha=alpha_level, label="ABC-SMC")
- savefig(gamma_plot,"../figs/gamma_plot_secondwave.png")
+ savefig(gamma_plot,"../figs/gamma_plot_secondwave_2.png")
  
+  # ess
+ess_output = zeros(3)
+ess_output_time = copy(ess_output)
+ess_output[1]  = try rcopy(R"mean(mcmcse::ess($(output_abc[1])))") catch; 0 end
+ess_output_time[1]  = ess_output[1] / output_abc[2]
+ess_output[2]  = try rcopy(R"mean(mcmcse::ess($(output_mcmc[1])))") catch; 0 end
+ess_output_time[2]  = ess_output[2] / output_mcmc[2]
+ess_output[3]  = try rcopy(R"mean(mcmcse::ess($(output_smc[1])))") catch; 0 end
+ess_output_time[3]  = ess_output[3] / output_smc[2]
+
+save("../results/covid/ess_secondwave_2.jld","ess_output",ess_output)
+save("../results/covid/ess_cputime_secondwave_2.jld","ess_output_time",ess_output_time)

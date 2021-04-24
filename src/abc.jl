@@ -22,7 +22,6 @@ function ABC(y,yhat_generator,algo_parameters,N_samples)
 
         # in case there is no soln given the parameters
         if size_y != size(yhat)
-            
             continue
         end
 
