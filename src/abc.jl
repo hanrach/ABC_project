@@ -26,6 +26,7 @@ function ABC(y,yhat_generator,algo_parameters,N_samples)
         end
 
         # check acceptance
+    
         if algo_parameters[:d](eta_y,algo_parameters[:eta](yhat)) < algo_parameters[:epsilon]
             for j in 1:q
                 result[i,j] = p[j]
