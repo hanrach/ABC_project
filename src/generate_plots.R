@@ -2,17 +2,18 @@ library(tidyverse)
 library(here)
 
 df_covid <- read_csv(here("data","covid19_bc_pre_vaccine_weekly.csv"))
+df_covid <- read_csv(here("data","covid19_bc_post_vaccine_weekly.csv"))
 
 mcmc <- read_rds("mcmc.rds")
 
 plot(df_covid$I,type='l')
 
-lines(mcmc[[2]][,sample(1:35,1)],col='red')
+lines(mcmc[[2]][,sample(1:500,1)],col='red')
 
 
 plot(df_covid$R,type='l')
 
-lines(mcmc[[3]][,sample(1:35,1)],col='blue')
+lines(mcmc[[3]][,sample(1:500,1)],col='blue')
 
 
 
@@ -20,12 +21,12 @@ smc <- read_rds("smc.rds")
 
 plot(df_covid$I,type='l')
 
-lines(smc[[2]][,sample(1:35,1)],col='red')
+lines(smc[[2]][,sample(1:500,1)],col='red')
 
 
 plot(df_covid$R,type='l')
 
-lines(smc[[3]][,sample(1:35,1)],col='blue')
+lines(smc[[3]][,sample(1:500,1)],col='blue')
 
 df <- read_csv(here('data',"covid19-canada.csv")) %>% 
   filter(prname=='Canada') %>%

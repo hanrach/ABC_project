@@ -35,6 +35,7 @@ df_covid_BC_post = filter(:t => >=(Date(2021,1,11)),df_covid_BC)
 
 
 # save the output
+CSV.write("data/covid_19_bc_all.csv",df_covid_BC)
 CSV.write("data/covid19_bc_pre_vaccine.csv",df_covid_BC_pre)
 CSV.write("data/covid19_bc_post_vaccine.csv",df_covid_BC_post)
 
