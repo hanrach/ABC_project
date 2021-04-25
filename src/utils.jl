@@ -65,3 +65,11 @@ function CPUtoc_modified(verbose)
     end
     return t
 end
+
+function show_calibration(simulation)
+    @printf("Calibration: ABC %f, ABC MCMC %f, ABC SMC %f\n", mean(simulation[2],dims=1)[1], mean(simulation[2],dims=1)[2],mean(simulation[2],dims=1)[3])
+    @printf("CPU_time: ABC %f, ABC MCMC %f, ABC SMC %f\n", mean(simulation[4],dims=1)[1], mean(simulation[4],dims=1)[2],mean(simulation[4],dims=1)[3])
+    @printf("ESS: ABC %f, ABC MCMC %f, ABC SMC %f\n", median(simulation[5],dims=1)[1], median(simulation[5],dims=1)[2],median(simulation[5],dims=1)[3])
+    @printf("ESS: ABC %f, ABC MCMC %f, ABC SMC %f\n", mean(simulation[5],dims=1)[1], mean(simulation[5],dims=1)[2],mean(simulation[5],dims=1)[3])
+    @printf("ESS Time: ABC %f, ABC MCMC %f, ABC SMC %f\n", mean(simulation[6],dims=1)[1], mean(simulation[6],dims=1)[2],mean(simulation[6],dims=1)[3])
+end
