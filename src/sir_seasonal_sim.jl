@@ -21,7 +21,7 @@ df_tot = DataFrame(CSV.File("../data/covid_19_bc_all.csv"))
 
  """ Post-vaccine analysis """
  tot_days = size(df_tot)[1]
- time_interval = 7
+ time_interval = 1
  
  y_tot = hcat([df_tot[:S],df_tot[:I],df_tot[:R]]...)[1:7:tot_days,:]
  y_tot = y_tot./1e4
@@ -59,8 +59,8 @@ df_tot = DataFrame(CSV.File("../data/covid_19_bc_all.csv"))
 
  p_predicted=(50.,0.4,0.1,3.,0.5)
  sol_hat = data_generator(p_predicted)
- plot(abc_solutions[:,:,1]', yaxis=:log,label = ["s_model" "i_model" "r_model"])
- plot!(y_tot, yaxis=:log,label=["s" "i" "r"], seriestype=:scatter)
+ plot(abc_solutions[:,:,1]'[:,2:3],label = ["s_model" "i_model" "r_model"])
+ plot!(y_tot[:,2:3],label=["s" "i" "r"], seriestype=:scatter)
  # plot(solution_day[2:end], yaxis=:log, label = ["s_model" "i_model" "r_model"], title="Daily:β=0.042, γ=0.07"); 
 # plot!(1:7:250, y_pre, yaxis=:log, label=["s" "i" "r"], seriestype=:scatter)
 
