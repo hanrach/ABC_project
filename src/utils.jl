@@ -18,6 +18,9 @@ function compute_norm(y,yhat;p=2)
     norm(y[2:3,2:end] - yhat[2:3,2:end], p)/size(y)[1]
 end
 
+function compute_full_norm(y,yhat;p=2)
+    norm(y[2:3,2:end] - yhat[2:3,2:end], p)/size(y)[1]
+end
 
 function random_walk(p_prev, sd)
     # return proposed p, log(q(p_n+1|p_n))

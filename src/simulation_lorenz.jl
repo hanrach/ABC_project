@@ -15,18 +15,20 @@ include("BayesianCalibration.jl")
 include("abcSMC.jl")
 
 # test ABC
-function data_generator_lorenz(p, u0)
+function data_generator_lorenz(p)
+    sigma, rho, beta, x0 = p
+    u0 = [x0, 1., 1.]
+    p = (sigma, rho, beta)
     time_window=(0,100.0)
     solve_lorenz(u0,time_window,p)
 end
 
-# sigma, rho, beta
-p=(10., 28., 3)
-solution1 = data_generator_lorenz(p, [1., 1., 1.])
-solution2 = data_generator_lorenz(p, [1.1, 1.1,1.1])
+# sigma, rho, beta, x0
+p1=(10., 28., 8/3, 1.1)
+p2 = (10., 28., 8/3, 1.)
+solution1 = data_generator_lorenz(p1)
+solution2 = data_generator_lorenz(p2)
 
-plot(solution1, vars=(1,2,3))
-plot!(solution2, vars=(1,2,3))
 
 algo_parameters = (prior = (Gamma(2,1),Gamma(1,1)),epsilon = 25,
 eta= identity_mapping, d= distanceFunction)
