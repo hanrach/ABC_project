@@ -3,6 +3,7 @@ using DataFrames
 using Dates
 using CSV
 using Printf
+using RCall
 
 function create_weekly_data(data_name,output_name)
     df = DataFrame(CSV.File(data_name))
@@ -27,8 +28,7 @@ function process_result(data_path,data_name)
     key = [i for i in keys(dat)]
     dat = dat[key[1]]
     long = map(x-> dat[x,:,:],[1;2;3])
-    @rput long
-    R"saveRDS(long,$data_name)"
+    R"saveRDS($long,$data_name)"
 end
 
 # save weekly data
@@ -39,7 +39,7 @@ covid_csv_files = "data/" .* covid_csv_files
 create_weekly_data.(covid_csv_files,output_names)
 
 # save results as rds files
-results = readdir("results/covid")
-output_names = "results/covid_rds/" .* replace.(results,".jld" => ".rds")
-results = "results/covid/" .* results
+results = readdir("results/covid/solution")
+output_names = "results/covid/covid_rds/" .* replace.(results,".jld" => ".rds")
+results = "results/covid/solution/" .* results
 process_result.(results,output_names)

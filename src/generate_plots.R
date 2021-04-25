@@ -14,17 +14,17 @@ source(here("src","fbplot.R"))
 select <- dplyr::select
 
 data_dir <- "data/weekly"
-results_dir <- "results/covid_rds/"
-output_dir <- "results/covid_fitted_values/"
+results_dir <- "results/covid/covid_rds/"
+output_dir <- "results/covid/covid_fitted_values/"
 data_names <- list.files(here(data_dir))
 results_names <- list.files(here(results_dir))
 
 I_col <- "black"
-R_col <- "grey"
+R_col <- "purple"
 I_est_col <- "red"
 I_fb_col <- "pink"
-R_est_col <- 'purple'
-R_fb_col <- 'violet'
+R_est_col <- '#006400'
+R_fb_col <- 'yellowgreen'
  
 
 fig_dpi <- 300
@@ -36,7 +36,14 @@ theme_text_size <- theme(axis.text.x = element_text(size=tick_label_size),
                          text = element_text(size=label_size))
 scale_factor <- 1
 y_lab <- "Number of persons (10,000)"
-  
+
+line_size  <- 2 
+fig_label <- c("Infected",
+               "Est. Infected",
+               "Recovered",
+               "Est. Recovered")
+line_alpha <- 0.9
+
 generate_fbp_plot <- function(key_word){
   df <- read_csv(here(data_dir,paste0(data_names[str_detect(data_names,key_word)])))
   rds_list <- results_names[str_detect(results_names,key_word)]
@@ -75,13 +82,13 @@ generate_fbp_plot <- function(key_word){
       pivot_longer(cols=-1,names_to="type")
     
     gg <- ggplot() +
-      geom_line(data=df_gg,aes(x=t,y=value,color=type)) +
+      geom_line(data=df_gg,aes(x=t,y=value,color=type),size=line_size,alpha=line_alpha) +
       geom_line(data=df_I,
-                aes(x=df$t,y=y,color=type)) +
+                aes(x=df$t,y=y,color=type),size=line_size,alpha=line_alpha) +
       geom_ribbon(data=df_I,
                   aes(x=df$t,ymin=lower,ymax=upper,color=NA,fill=type),alpha=0.5)+
       geom_line(data=df_R,
-                aes(x=df$t,y=y,color=type)) +
+                aes(x=df$t,y=y,color=type),size=line_size,alpha=line_alpha) +
       geom_ribbon(data=df_R,
                   aes(x=df$t,ymin=lower,ymax=upper,color=NA,fill=type),alpha=0.5) +
       ylim(0,max_y)+
@@ -89,7 +96,8 @@ generate_fbp_plot <- function(key_word){
       ylab(y_lab) +
       xlab("") +
       labs(subtitle=subtitle)+
-      scale_color_manual(values=c("I"=I_col,
+      scale_color_manual(labels=fig_label,
+                         values=c("I"=I_col,
                                   "R"=R_col,
                                   "I_est"=I_est_col,
                                   "R_est"=R_est_col)) +
@@ -109,7 +117,7 @@ generate_fbp_plot <- function(key_word){
 # combine the three
 # take y axis & legend
 
-combine_plots <- function(gg_list){
+combine_plots <- function(gg_list,title){
   lg <- ggpubr::get_legend(gg_list[[1]],position='top')
   
   gg_list <- lapply(gg_list,function(gg){
@@ -118,25 +126,21 @@ combine_plots <- function(gg_list){
       # theme(legend.position='none')
   })
   
-  fig <- ggpubr::ggarrange(gg_list[[1]],gg_list[[2]],gg_list[[3]],ncol=3,
+  fig <- ggpubr::ggarrange(gg_list[[3]],gg_list[[1]],gg_list[[2]],ncol=3,
                     common.legend=T,
                     legend='top')
   fig <- annotate_figure(fig,
-                  left = text_grob(y_lab,rot=90,size = 20))
+                  left = text_grob(y_lab,rot=90,size = 20),
+                  top = text_grob(title,size=25,face = "bold"))
   fig
 }
 
 # nice fig size: 15.9 x 6.79 in
 
 # pre vac
-gg_pre <- combine_plots(generate_fbp_plot("pre"))
-ggsave(here("results","covid_fitted_values","pre.jpg"),plot = gg_pre,dpi = fig_dpi)
+gg_pre <- generate_fbp_plot("pre")
+ggsave(here("results","covid","covid_fitted_values","pre.jpg"),plot = combine_plots(gg_pre,"Pre"),dpi = fig_dpi)
 
 # post vac
-gg_post <- combine_plots(generate_fbp_plot("post"))
-ggsave(here("results","covid_fitted_values","post.jpg"),plot = gg_post,dpi = fig_dpi)
-
-
-# second wave
-gg_second_wave <- combine_plots(generate_fbp_plot("second"))
-ggsave(here("results","covid_fitted_values","secondwave.jpg"),plot = gg_second_wave,dpi = fig_dpi)
+gg_post <- generate_fbp_plot("post")
+ggsave(here("results","covid","covid_fitted_values","post.jpg"),plot = combine_plots(gg_post,"Post"),dpi = fig_dpi)
