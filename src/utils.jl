@@ -36,22 +36,6 @@ function proposal_Normal_density(p1, p2, sd)
     return map( (x,y,z) -> pdf(Normal(x,z),y), p1, p2, sd )
 end
 
-function proposal_LN(log_p_prev,sd)
-    log_p_prev .+ rand.(Normal.(0,sd))
-end
-
-function proposalRatio_LN(p_prev,p_cand,sd)
-    0.5
-end
-
-function proposal_Gamma(log_p_prev,k)
-    #TODO
-end
-
-function proposalRatio_Gamma(p_prev,p_cand,k)
-    # TODO
-end
-
 function proposal_Normal(p_prev,sd)
     p_prev .+ rand.(Normal.(0,sd))
 end
@@ -84,4 +68,3 @@ function CPUtoc_modified(verbose)
     end
     return t
 end
-
