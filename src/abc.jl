@@ -26,9 +26,9 @@ function ABC(y,yhat_generator,algo_parameters,N_samples)
         end
 
         # check acceptance
-    
+
         if algo_parameters[:d](eta_y,algo_parameters[:eta](yhat)) < algo_parameters[:epsilon]
-            result[i,:] = p
+            result[i,:] .= p
             i += 1
         end
 
