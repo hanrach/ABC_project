@@ -9,7 +9,8 @@ function BayesianCalibration(N_experiments,N_samples,alpha,
     time_window=(0,10.0),
     add_noise = false,
     true_p_dist=(Gamma(2,1),Gamma(1,1)),
-    save_param_output=false)
+    save_param_output=false, 
+    model = "SIR")
 
     # initial pop
     s0 = sum(initial_state)
@@ -22,7 +23,7 @@ function BayesianCalibration(N_experiments,N_samples,alpha,
 
     # list of param values
     true_param = rand.(true_p_dist,N_experiments)
-
+   
     # Calibration value
     res = zeros(N_experiments,N_algo)
 
@@ -40,7 +41,7 @@ function BayesianCalibration(N_experiments,N_samples,alpha,
     ess_output_time = copy(ess_output)
 
     # data generator
-    function data_generator(p)
+    function data_generator_sir(p)
         y = ode_model(initial_state,time_window,p)
         if add_noise
             y = y + rand(LogNormal(0,0.5),size(y))
@@ -49,15 +50,36 @@ function BayesianCalibration(N_experiments,N_samples,alpha,
         y
     end
 
-    #lorenz data generator
+    # data generator  lorenz
     function data_generator_lorenz(p)
-
+        sigma, rho, beta, x0 = p
+        u0 = [x0, initial_state[2], initial_state[3]]
+        param = (sigma, rho, beta)
+        y = ode_model(initial_state,time_window,param)
+        if add_noise
+            y = y + rand(LogNormal(0,0.5),size(y))
+            y = y ./ sum(y,dims=1) * s0
+        end
+        y
     end
+
+    if model=="SIR"
+        data_generator = data_generator_sir
+    else
+        data_generator = data_generator_lorenz
+    end
+
+
 
     for i in 1:N_experiments
         # generate data
         # firt sample true SIR parameters
-        true_p = (true_param[1][i],true_param[2][i])
+        # true_p = (true_param[1][i],true_param[2][i])
+        true_p_vec=zeros(N_param)
+        for k in 1:N_param
+            true_p_vec[k] = true_param[k][i]
+        end
+        true_p = Tuple(true_p_vec)
         # generate data
         y = data_generator(true_p)
 
