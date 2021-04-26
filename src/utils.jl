@@ -18,8 +18,8 @@ function compute_norm(y,yhat;p=2)
     norm(y[2:3,2:end] - yhat[2:3,2:end], p)/size(y)[1]
 end
 
-function compute_full_norm(y,yhat;p=2)
-    norm(y[2:3,2:end] - yhat[2:3,2:end], p)/size(y)[1]
+function compute_full_norm(y,yhat;p=Inf)
+    norm(y - yhat, p)/size(y)[1]
 end
 
 function random_walk(p_prev, sd)
@@ -34,6 +34,22 @@ end
 
 function proposal_Normal_density(p1, p2, sd)
     return map( (x,y,z) -> pdf(Normal(x,z),y), p1, p2, sd )
+end
+
+function proposal_LN(log_p_prev,sd)
+    log_p_prev .+ rand.(Normal.(0,sd))
+end
+
+function proposalRatio_LN(p_prev,p_cand,sd)
+    0.5
+end
+
+function proposal_Gamma(log_p_prev,k)
+    #TODO
+end
+
+function proposalRatio_Gamma(p_prev,p_cand,k)
+    # TODO
 end
 
 function proposal_Normal(p_prev,sd)
@@ -68,3 +84,4 @@ function CPUtoc_modified(verbose)
     end
     return t
 end
+

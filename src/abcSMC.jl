@@ -39,7 +39,7 @@ function ABC_SMC(y,yhat_generator,algo_parameters,N_samples)
     weights_prev = weights
     while (t <= time_final)
         nParticle=1
-        p_cand = (0,0)
+        p_cand = Tuple(zeros(q))
         while nParticle <= N_samples
             # sample the index with with weights
             sampled_index = wsample(1:N_samples,weights_prev,1)

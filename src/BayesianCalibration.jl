@@ -47,6 +47,11 @@ function BayesianCalibration(N_experiments,N_samples,alpha,
         y
     end
 
+    #lorenz data generator
+    function data_generator_lorenz(p)
+
+    end
+
     for i in 1:N_experiments
         # generate data
         # firt sample true SIR parameters
