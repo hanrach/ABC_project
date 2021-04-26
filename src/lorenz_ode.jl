@@ -1,4 +1,4 @@
-function solve_lorenz(u0, tspan, p, time_interval=0.05)
+function solve_lorenz(u0, tspan, p, time_interval=0.01)
     function lorenz(du, u, p, t)
             du[1] = p[1]*(u[2]-u[1])
             du[2] = u[1]*(p[2] - u[3]) - u[2]
