@@ -42,7 +42,7 @@ ggplot(data=gg.calibration %>%
   theme(legend.position = 'top',
         legend.title = element_blank()) -> gg.cal
 
-ggsave(paste0(results_dir,"calibration.jpg"),plot = gg.cal,dpi = fig_dpi)
+ggsave(paste0(results_dir,"/calibration.jpg"),plot = gg.cal,dpi = fig_dpi)
 
 df_ess <- read_csv(paste0(results_dir,"/ess.csv"))
   # filter(ABC<=5000)
