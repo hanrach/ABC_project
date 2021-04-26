@@ -8,7 +8,8 @@ function BayesianCalibration(N_experiments,N_samples,alpha,
     initial_state = [99.0;1.0;0.0],
     time_window=(0,10.0),
     add_noise = false,
-    true_p_dist=(Gamma(2,1),Gamma(1,1)))
+    true_p_dist=(Gamma(2,1),Gamma(1,1)),
+    save_param_output=false)
 
     # initial pop
     s0 = sum(initial_state)
@@ -26,8 +27,9 @@ function BayesianCalibration(N_experiments,N_samples,alpha,
     res = zeros(N_experiments,N_algo)
 
     # algo output
-    param_output = zeros(N_experiments,N_samples,N_param,N_algo)
-
+    if save_param_output
+        param_output = zeros(N_experiments,N_samples,N_param,N_algo)
+    end
     # algo time
     cputime_output = zeros(N_experiments, N_algo)
 
@@ -69,12 +71,17 @@ function BayesianCalibration(N_experiments,N_samples,alpha,
             res[i,algo_index] = all(map(ind -> check_in_interval(true_p[ind],compute_posterior(vec(output[:,ind]),alpha)),1:length(true_p)))
 
             # save output
-            param_output[i,:,:,algo_index] = output
+            if save_param_output
+                param_output[i,:,:,algo_index] = output
+            end
             cputime_output[i,algo_index] =  cpu_time
             # use R's package mcmcse to compute ESS
-            # output = transpose(output)
             ess_output[i,algo_index]  = try rcopy(R"mean(mcmcse::ess($output))") catch; 0 end
             ess_output_time[i,algo_index]  = ess_output[i,algo_index] / cpu_time
+        end
+
+        if !save_param_output
+            param_output = nothing
         end
 
         if i % 100 == 0

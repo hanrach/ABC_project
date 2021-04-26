@@ -16,7 +16,7 @@ function ABC_MCMC(y,yhat_generator,algo_parameters,N_samples)
     result = zeros(N_samples,q)
     dist = Inf
     p_prev=(0,0)
-    
+
     # initial point using ABC
     while (dist > algo_parameters[:epsilon])
         p_prev = rand.(algo_parameters[:prior])
