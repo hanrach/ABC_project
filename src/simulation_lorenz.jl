@@ -11,8 +11,8 @@ include("utils.jl")
 include("lorenz_ode.jl")
 include("abc.jl")
 include("abcMCMC.jl")
-include("BayesianCalibration.jl")
 include("abcSMC.jl")
+include("BayesianCalibration.jl")
 
 
 # sigma, rho, beta, x0
@@ -38,16 +38,16 @@ true_prior=(sigma_true, rho_true, beta_true, x0_true)
 
 
 algo_parameter_smc = (prior = ( sigma_prior, rho_prior, beta_prior, x0_prior), time_final=5, eps_list = [50, 50, 30, 25, 20],
-eta= identity_mapping, d= compute_full_norm, kernel=proposal_Normal, 
+eta= identity_mapping, d= compute_full_norm, kernel=proposal_Normal,
 kernel_density=proposal_Normal_density,
-sd=(0.5,0.5, 0.5, 0.5), resample_method=systematic_resample, verbose=true)
+sd=(0.5,0.5, 0.5, 0.5), resample_method=systematic_resample, verbose=false)
 
 
 # test ABC MCMC
 algo_parameter_mcmc = (prior = ( sigma_prior, rho_prior, beta_prior, x0_prior) ,epsilon = 20, eta = identity_mapping,
                         d= compute_full_norm, proposal = proposal_Normal,
                         proposalRatio = proposalRatio_Normal,sd = (0.5,0.5, 0.5, 0.5),
-                        thinning = 100, burn_in = 100,verbose=true)
+                        thinning = 10, burn_in = 100,verbose=false)
 
 # Bayesian Calibration
 algo_list = (ABC=ABC, ABC_MCMC=ABC_MCMC, ABC_SMC=ABC_SMC)
@@ -56,7 +56,7 @@ algo_param_list = (ABC = algo_parameter_ABC,
                    ABC_MCMC = algo_parameter_mcmc,
                    ABC_SMC = algo_parameter_smc)
 
-simulation = BayesianCalibration(Int(2),Int(10),0.10,algo_list,algo_param_list,
+simulation = BayesianCalibration(Int(2^10),Int(250),0.10,algo_list,algo_param_list,
 ode_model = solve_lorenz,
 initial_state = [10., 10., 10.],
 time_window=(0,25.0),
@@ -77,8 +77,8 @@ using DataFrames
 simulation = load(results_dir*"output.jld")["output"]
 
 function to_dataframe(x)
-tmp = DataFrame(x)
-rename!(tmp,[:ABC,:MCMC,:SMC])
+    tmp = DataFrame(x)
+    rename!(tmp,[:ABC,:MCMC,:SMC])
 end
 
 CSV.write(results_dir*"calibration.csv",to_dataframe(simulation[2]))
