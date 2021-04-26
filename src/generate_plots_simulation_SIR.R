@@ -55,4 +55,4 @@ ess_cpu <- round(apply(df_ess_cpu,2,summary),0)
 ess %>% 
   cbind(cpu) %>% 
   cbind(ess_cpu) -> tab
-openxlsx::write.xlsx(tab %>% as.data.frame(),here(paste0(results_dir),"/tab.xlsx"))
+openxlsx::write.xlsx(tab %>% as.data.frame(),here(paste0(results_dir),"/tab.xlsx"),row.names=T)
