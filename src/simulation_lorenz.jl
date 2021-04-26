@@ -35,8 +35,6 @@ eta= identity_mapping, d= compute_full_norm)
 
 
 true_prior=(sigma_true, rho_true, beta_true, x0_true)
-true_p = map(x -> rand(x),true_p_dist)
-y = data_generator_lorenz(true_p)
 
 # output_abc=ABC(y, data_generator_lorenz, algo_parameters, 500)
 # n= size(output)[1]
@@ -66,7 +64,7 @@ algo_list = (ABC=ABC, ABC_MCMC=ABC_MCMC, ABC_SMC=ABC_SMC)
 
 algo_param_list = (ABC = algo_parameter_ABC,
                    ABC_MCMC = algo_parameter_mcmc,
-                   ABC_SMC = algo_parameters_smc)
+                   ABC_SMC = algo_parameter_smc)
 
 simulation = BayesianCalibration(Int(2),Int(250),0.10,algo_list,algo_param_list,
 ode_model = solve_lorenz,
