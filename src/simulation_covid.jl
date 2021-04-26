@@ -60,8 +60,19 @@ plot!(y[3,:])
 # calibration
 show_calibration(simulation)
 
-save("results/simulation_SIR/output.jld","output",simulation)
+results_dir = "results/simulation_SIR/"
 
-simulation = load("results/simulation_SIR/output.jld")["output"]
+save(results_dir*"output.jld","output",simulation)
 
-show_calibration(simulation)
+using DataFrames
+simulation = load(results_dir*"output.jld")["output"]
+
+function to_dataframe(x)
+    tmp = DataFrame(x)
+    rename!(tmp,[:ABC,:MCMC,:SMC])
+end
+
+CSV.write(results_dir*"calibration.csv",to_dataframe(simulation[2]))
+CSV.write(results_dir*"cpu.csv",to_dataframe(simulation[4]))
+CSV.write(results_dir*"ess.csv",to_dataframe(simulation[5]))
+CSV.write(results_dir*"ess_cpu.csv",to_dataframe(simulation[6]))
