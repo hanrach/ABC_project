@@ -55,7 +55,7 @@ function BayesianCalibration(N_experiments,N_samples,alpha,
         sigma, rho, beta, x0 = p
         u0 = [x0, initial_state[2], initial_state[3]]
         param = (sigma, rho, beta)
-        y = ode_model(initial_state,time_window,param)
+        y = ode_model(u0,time_window,param)
         if add_noise
             y = y + rand(LogNormal(0,0.5),size(y))
             y = y ./ sum(y,dims=1) * s0

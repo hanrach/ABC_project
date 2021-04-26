@@ -15,7 +15,7 @@ function ABC_MCMC(y,yhat_generator,algo_parameters,N_samples)
     N_samples = N_samples + algo_parameters[:burn_in]
     result = zeros(N_samples,q)
     dist = Inf
-    p_prev=(0,0)
+    p_prev=Tuple(zeros(q))
 
     # initial point using ABC
     while (dist > algo_parameters[:epsilon])
@@ -30,7 +30,7 @@ function ABC_MCMC(y,yhat_generator,algo_parameters,N_samples)
     naccept=0
     k = 1
     i = 0
-    p_cand = (0,0)
+    p_cand = Tuple(zeros(q))
     while i <= (N_samples*thinning_interval)
         # propose candidate parameters in log space
         valid = true

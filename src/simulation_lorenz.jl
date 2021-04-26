@@ -36,15 +36,6 @@ eta= identity_mapping, d= compute_full_norm)
 
 true_prior=(sigma_true, rho_true, beta_true, x0_true)
 
-# output_abc=ABC(y, data_generator_lorenz, algo_parameters, 500)
-# n= size(output)[1]
-# for k in 1:n
-#     p_pred = (output[k,1], output[k,2], output[k,3], output[k,4])
-#     y_fitted = data_generator_lorenz(p_pred)
-#     plot!(y_fitted,alpha=0.1, color="#BBBBBB", legend=false)
-# end
-# plot!(y, w=1, legend=false)
-
 
 algo_parameter_smc = (prior = ( sigma_prior, rho_prior, beta_prior, x0_prior), time_final=5, eps_list = [50, 50, 30, 25, 20],
 eta= identity_mapping, d= compute_full_norm, kernel=proposal_Normal, 
@@ -54,10 +45,9 @@ sd=(0.5,0.5, 0.5, 0.5), resample_method=systematic_resample, verbose=true)
 
 # test ABC MCMC
 algo_parameter_mcmc = (prior = ( sigma_prior, rho_prior, beta_prior, x0_prior) ,epsilon = 20, eta = identity_mapping,
-                        d= compute_norm, proposal = proposal_Normal,
+                        d= compute_full_norm, proposal = proposal_Normal,
                         proposalRatio = proposalRatio_Normal,sd = (0.5,0.5, 0.5, 0.5),
                         thinning = 100, burn_in = 100,verbose=true)
-
 
 # Bayesian Calibration
 algo_list = (ABC=ABC, ABC_MCMC=ABC_MCMC, ABC_SMC=ABC_SMC)
@@ -66,7 +56,7 @@ algo_param_list = (ABC = algo_parameter_ABC,
                    ABC_MCMC = algo_parameter_mcmc,
                    ABC_SMC = algo_parameter_smc)
 
-simulation = BayesianCalibration(Int(2),Int(250),0.10,algo_list,algo_param_list,
+simulation = BayesianCalibration(Int(2),Int(10),0.10,algo_list,algo_param_list,
 ode_model = solve_lorenz,
 initial_state = [10., 10., 10.],
 time_window=(0,25.0),
