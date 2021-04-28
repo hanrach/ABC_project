@@ -11,7 +11,7 @@ results_dir <- here("results","simulation_lorenz")
 
 df_calibration <- read_csv(paste0(results_dir,"/calibration.csv"))
 
-num <- 2^(0:10)
+num <- 2^(0:8)
 
 fig_dpi <- 300
 tick_label_size <-20
@@ -56,3 +56,4 @@ ess %>%
   cbind(cpu) %>% 
   cbind(ess_cpu) -> tab
 openxlsx::write.xlsx(tab %>% as.data.frame(),here(paste0(results_dir),"/tab.xlsx"),row.names=T)
+

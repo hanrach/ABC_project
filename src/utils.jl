@@ -18,6 +18,18 @@ function compute_norm(y,yhat;p=2)
     norm(y[2:3,2:end] - yhat[2:3,2:end], p)/size(y)[1]
 end
 
+function compute_l2_norm(y,yhat)
+    sol1=hcat(y[:]...)'
+    sol2=hcat(yhat[:]...)'
+    l2_error = sqrt(sum(sum((sol1.-sol2).^2,dims=2)*0.01,dims=1))[1]
+end
+
+function compute_l2_norm_decay(y,yhat)
+    sol1=hcat(y[:]...)'
+    sol2=hcat(yhat[:]...)'
+    T=size(sol1)[1]
+    l2_error = sqrt(sum(sum((sol1.-sol2).^2,dims=2).*exp.(-0.001*(1:1:T))*0.01,dims=1))[1]
+end
 
 function compute_full_norm(y,yhat;p=Inf)
     norm(y - yhat, p)/size(y)[1]
