@@ -57,7 +57,7 @@ generate_fbp_plot <- function(key_word){
   list_gg <- lapply(rds_list,function(rds_name){
     subtitle <- if_else(str_detect(rds_name,"smc"),"SMC",
                         if_else(str_detect(rds_name,"mcmc"),"MCMC",
-                                "ABC"))
+                                "Rej"))
     
     df_result <- read_rds(here(results_dir,rds_name))
     I <- df_result[[2]]
@@ -139,8 +139,8 @@ combine_plots <- function(gg_list,title){
 
 # pre vac
 gg_pre <- generate_fbp_plot("pre")
-ggsave(here("results","covid","covid_fitted_values","pre.jpg"),plot = combine_plots(gg_pre,"Pre"),dpi = fig_dpi)
+ggsave(here("results","covid","covid_fitted_values","pre.png"),plot = combine_plots(gg_pre,"Pre"),dpi = fig_dpi)
 
 # post vac
 gg_post <- generate_fbp_plot("post")
-ggsave(here("results","covid","covid_fitted_values","post.jpg"),plot = combine_plots(gg_post,"Post"),dpi = fig_dpi)
+ggsave(here("results","covid","covid_fitted_values","post.png"),plot = combine_plots(gg_post,"Post"),dpi = fig_dpi)

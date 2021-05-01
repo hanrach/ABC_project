@@ -30,8 +30,10 @@ lapply(num,function(x){
   pivot_longer(cols=1:3,values_to="value",names_to="method") -> gg.calibration
 
 ggplot(data=gg.calibration %>% 
+         mutate(method= if_else(method=="ABC","Rej",method)) %>% 
+         mutate(method = factor(method,levels=c("Rej","MCMC","SMC"))) %>% 
          filter(num>9),aes(x=log(num,2),y=value,col=method)) +
-  geom_line(alpha=0.5,size=2) +
+  geom_line(alpha=0.9,size=2) +
   ylim(0,1) +
   geom_hline(yintercept = 0.9,col='purple',size=2,alpha=0.9) +
   theme_classic() +
@@ -42,7 +44,7 @@ ggplot(data=gg.calibration %>%
   theme(legend.position = 'top',
         legend.title = element_blank()) -> gg.cal
 
-ggsave(paste0(results_dir,"/calibration.jpg"),plot = gg.cal,dpi = fig_dpi)
+ggsave(paste0(results_dir,"/calibration.png"),plot = gg.cal,dpi = fig_dpi)
 
 df_ess <- read_csv(paste0(results_dir,"/ess.csv"))
 # filter(ABC<=5000)
